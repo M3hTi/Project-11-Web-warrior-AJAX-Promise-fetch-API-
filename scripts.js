@@ -3,6 +3,7 @@ let url = `https://newsapi.org/v2/top-headlines?category=sports&country=us&apiKe
 const newsContainer = document.querySelector(".content")
 const searchInput = document.querySelector('.search-input')
 const searchBtn = document.querySelector('.search-btn')
+const aside = document.querySelector('.headlines')
 
 
 
@@ -59,10 +60,12 @@ function handleSearchEvent(e) {
 
 function displayNews(arr){
     newsContainer.innerHTML = ''; // Clear previous content
+    aside.innerHTML = '<h2>Current Headlines</h2>'; // Reset headlines but keep the title
     
-    arr.forEach(article => {
+    arr.forEach((article, index) => {
         const articleContainer = document.createElement("article");
         articleContainer.className = "news-article";
+        articleContainer.id = `article-${index}`; // Add unique ID for scrolling
         
         // Only create and append image if urlToImage exists
         if (article.urlToImage) {
@@ -99,6 +102,16 @@ function displayNews(arr){
         articleContainer.appendChild(meta);
         articleContainer.appendChild(link);
 
+        // Add to headlines sidebar with click functionality
+        const headline = document.createElement("div");
+        headline.className = "headline-item";
+        const headlineLink = document.createElement("a");
+        headlineLink.href = `#article-${index}`;
+        headlineLink.textContent = article.title || 'No title available';
+        
+
+        headline.appendChild(headlineLink);
+        aside.appendChild(headline);
         newsContainer.appendChild(articleContainer);
     });
 }
