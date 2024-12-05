@@ -65,6 +65,7 @@ header {
 .search-section {
     text-align: right;
     margin-top: -30px;
+    position: relative;
 }
 
 .search-input {
