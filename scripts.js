@@ -4,6 +4,7 @@ const newsContainer = document.querySelector(".content")
 const searchInput = document.querySelector('.search-input')
 const searchBtn = document.querySelector('.search-btn')
 const aside = document.querySelector('.headlines')
+const serachSection = document.querySelector('.search-section')
 
 
 
@@ -116,4 +117,84 @@ function displayNews(arr){
     });
 }
 
+function autoComplete() {
+    fetch('keywords.json')
+    .then(response => {
+        if(!response.ok) throw Error(response.statusText)
+        return response.json()
+    })
+    .then(data => {
+        const searchInput = document.querySelector('.search-input').value
+        const matches = []
+        matchFound(searchInput, data.keywords, matches)
+        console.log(matches)
+        showMatchesWords(matches)
+
+    })
+    .catch(error => {
+        console.log("Fetch error:", error)  // More detailed error logging
+    })
+}
+
+function matchFound(searchInput, keywords, matches) {
+    // Only find matches if searchInput has content
+    if (searchInput.trim() !== '') {
+        keywords.forEach(keyword => {
+            if (keyword.toLowerCase().startsWith(searchInput.toLowerCase())) {
+                matches.push(keyword)
+            }
+        })
+    }
+}
+
+function showMatchesWords(arr) {
+    // Remove existing suggestions
+    const existingList = serachSection.querySelector('ul');
+    if (existingList) {
+        existingList.remove();
+    }
+
+    // Don't show suggestions if array is empty
+    if (arr.length === 0) {
+        return;
+    }
+
+    // Create new suggestions list
+    const lists = document.createElement('ul')
+    lists.style.position = 'absolute'
+    lists.style.top = '50px'
+    lists.style.right = '100px'
+    lists.style.width = '200px'
+    lists.style.backgroundColor = 'white'
+    lists.style.border = '1px solid #ddd'
+    lists.style.borderRadius = '4px'
+    lists.style.padding = '0'
+    lists.style.margin = '0'
+    lists.style.listStyle = 'none'
+    lists.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+    lists.style.maxHeight = '200px'
+    lists.style.overflowY = 'auto'
+
+    arr.forEach(word => {
+        const listItem = document.createElement('li')
+        listItem.textContent = word
+        listItem.style.padding = '8px 12px'
+        listItem.style.cursor = 'pointer'
+        listItem.style.borderBottom = '1px solid #eee'
+        listItem.addEventListener('mouseover', () => {
+            listItem.style.backgroundColor = '#f0f0f0'
+        })
+        listItem.addEventListener('mouseout', () => {
+            listItem.style.backgroundColor = 'white'
+        })
+        listItem.addEventListener('click', () => {
+            searchInput.value = word
+            lists.remove()
+        })
+        lists.appendChild(listItem)
+    })
+    serachSection.appendChild(lists)
+}
+
+searchInput.addEventListener('input', autoComplete)
 window.addEventListener("load", initializeNews);
